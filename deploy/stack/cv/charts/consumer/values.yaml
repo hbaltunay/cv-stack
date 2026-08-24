@@ -1,0 +1,14 @@
+replicaCount: 1
+namespace: cv
+
+image:
+  repository: queue-consumer
+  tag: v1
+  pullPolicy: Never
+
+resources:
+  cpuRequest: "100m"
+  cpuLimit: "200m"
+  memoryRequest: "128Mi"
+  memoryLimit: "256Mi"
+  storageLimit: "500Mi"

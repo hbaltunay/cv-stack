@@ -1,0 +1,22 @@
+replicaCount: 1
+namespace: cv
+
+image:
+  repository: redis
+  tag: 8.8.0
+  pullPolicy: Never
+
+service:
+  type: ClusterIP
+  port: 6379
+  targetPort: 6379
+
+resources:
+  cpuRequest: "50m"
+  cpuLimit: "100m"
+  memoryRequest: "64Mi"
+  memoryLimit: "128Mi"
+  storageLimit: "512Mi"
+
+auth:
+  password: ""

@@ -1,0 +1,62 @@
+namespace: cv
+environment: test
+
+image:
+  repository: apache/kafka
+  tag: "4.3.1"
+  pullPolicy: Never
+
+service:
+  type: ClusterIP
+  port: 9092
+
+kafka:
+  kafkaClusterId: "cv-kafka-cluster"
+
+ports:
+  containerPort: 9092
+  controllerPort: 9093
+  externalPort: 9094
+
+resources:
+  cpuRequest: "250m"
+  cpuLimit: "1000m"
+  memoryRequest: "512Mi"
+  memoryLimit: "1Gi"
+  storageLimit: "1Gi"
+
+replicaCount: 1
+
+kafkaInfrastructure:
+  bootstrapServers: "{{ .Release.Name }}-{{ .Chart.Name }}-service:9092"
+  topics:
+    - name: "infer-topic"
+      partitions: 1
+      replicationFactor: 1
+      configs:
+        retention.ms: "1200000"
+        max.message.bytes: "5242880"
+        compression.type: "snappy"
+    - name: "test-topic"
+      partitions: 1
+      replicationFactor: 1
+      configs:
+        retention.ms: "120000"
+        max.message.bytes: "5242880"
+        compression.type: "snappy"
+
+initJob:
+  enabled: false
+  image:
+    repository: queue-init
+    tag: v1
+    pullPolicy: Never
+
+initService:
+  initContainers:
+    - name: wait-for-queue-service
+      image: busybox:1.38.0
+      command:
+        - sh
+        - -c
+        - until nc -z cv-stack-queue-service 9092; do sleep 1; done

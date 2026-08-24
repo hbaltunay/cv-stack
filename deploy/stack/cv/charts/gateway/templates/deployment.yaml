@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Chart.Name }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}-container
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+          - "uvicorn"
+          - "app.main:app"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8008"
+          # - "--workers"
+          # - "2"
+        ports:
+        - containerPort: 8008
+        resources:
+          limits:
+            cpu: {{ .Values.resources.cpuLimit | quote }}
+            memory: {{ .Values.resources.memoryLimit | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}
+          requests:
+            cpu: {{ .Values.resources.cpuRequest | quote }}
+            memory: {{ .Values.resources.memoryRequest | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}

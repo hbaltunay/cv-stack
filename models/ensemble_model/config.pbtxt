@@ -1,0 +1,48 @@
+name: "ensemble_model"
+platform: "ensemble"
+max_batch_size: 10
+
+input [
+  {
+    name: "ENSEMBLE_INPUT_0"
+    data_type: TYPE_UINT8
+    dims: [ -1 ]
+  }
+]
+
+output [
+  {
+    name: "ENSEMBLE_OUTPUT_0"
+    data_type: TYPE_FP32
+    dims: [2, 5]
+  }
+]
+
+ensemble_scheduling {
+  step [
+    {
+      model_name: "dali_preprocess"
+      model_version: -1
+      input_map {
+        key: "DALI_INPUT_0"
+        value: "ENSEMBLE_INPUT_0"
+      }
+      output_map {
+        key: "DALI_OUTPUT_0"
+        value: "preprocessed_output"
+      }
+    },
+    {
+      model_name: "cv_model"
+      model_version: -1
+      input_map {
+        key: "input_0"
+        value: "preprocessed_output"
+      }
+      output_map {
+        key: "output_0"
+        value: "ENSEMBLE_OUTPUT_0"
+      }
+    }
+  ]
+}

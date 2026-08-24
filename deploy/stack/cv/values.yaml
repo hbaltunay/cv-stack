@@ -1,0 +1,12 @@
+global:
+  namespace: cv
+gateway:
+  enabled: true
+serve:
+  enabled: true
+cache:
+  enabled: true
+queue:
+  enabled: true
+consumer:
+  enabled: true

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Chart.Name }}
+    spec:
+      terminationGracePeriodSeconds: 3
+      containers:
+      - name: {{ .Release.Name }}-container
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+          - "tritonserver"
+          - "--model-repository=/model_repository"
+          - "--model-control-mode=explicit"
+          # - "--log-verbose=1"
+          # - "--log-info=true"
+          # - "--log-warning=true"
+          # - "--log-error=true"
+          # - "--log-format=ISO8601"
+          # - "--trace-config"
+          # - "level=TIMESTAMPS"
+          # - "--trace-config"
+          # - "rate=1"
+          # - "--trace-config"
+          # - "count=-1"
+          # - "--trace-config"
+          # - "triton,file=/tmp/trace.json"
+          # - "--trace-config"
+          # - "triton,log-frequency=50"
+        env:
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: "compute,utility,driver"
+          - name: DALI_DISABLE_NVML
+            value: "1"
+        ports:
+        - containerPort: 8000
+        - containerPort: 8001
+        - containerPort: 8002
+        # - name: http
+        #   containerPort: {{ .Values.service.targetPort }}
+        resources:
+          limits:
+            cpu: {{ .Values.resources.cpuLimit | quote }}
+            memory: {{ .Values.resources.memoryLimit | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}
+            nvidia.com/gpu: {{ .Values.resources.gpuLimit | quote }}
+          requests:
+            cpu: {{ .Values.resources.cpuRequest | quote }}
+            memory: {{ .Values.resources.memoryRequest | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}
+            nvidia.com/gpu: {{ .Values.resources.gpuLimit | quote }}

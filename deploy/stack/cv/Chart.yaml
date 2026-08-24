@@ -1,0 +1,27 @@
+apiVersion: v2
+name: cv-stack
+description: CV Stack
+version: 0.1.0
+type: application
+
+dependencies:
+  - name: gateway
+    version: "0.1.0"
+    repository: "file://charts/gateway"
+    condition: gateway.enabled
+  - name: serve
+    version: "0.1.0"
+    repository: "file://charts/serve"
+    condition: serve.enabled
+  - name: cache
+    version: "0.1.0"
+    repository: "file://charts/cache"
+    condition: cache.enabled
+  - name: queue
+    version: "0.1.0"
+    repository: "file://charts/queue"
+    condition: queue.enabled
+  - name: consumer
+    version: "0.1.0"
+    repository: "file://charts/consumer"
+    condition: consumer.enabled

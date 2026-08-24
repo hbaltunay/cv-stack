@@ -1,0 +1,28 @@
+replicaCount: 1
+namespace: cv
+
+image:
+  repository: app-gateway
+  tag: v1
+  pullPolicy: Never
+
+service:
+  type: LoadBalancer
+  name: http
+  port: 8008
+  targetPort: 8008
+  nodePort: 30003
+
+serviceMonitor:
+  enabled: false
+
+env:
+  - name: TRITON_URL
+    value: "triton-server-service.cv.svc.cluster.local"
+
+resources:
+  cpuRequest: "250m"
+  cpuLimit: "500m"
+  memoryRequest: "128Mi"
+  memoryLimit: "256Mi"
+  storageLimit: "1Gi"

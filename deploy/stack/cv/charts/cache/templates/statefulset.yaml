@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+spec:
+  serviceName: {{ .Release.Name }}-{{ .Chart.Name }}-head-service
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Chart.Name }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}-container
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+          - redis-server
+          - --requirepass
+          - $(REDIS_PASSWORD)
+        env:
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secret
+                key: password
+        ports:
+          - containerPort: {{ .Values.service.port }}
+        resources:
+          limits:
+            cpu: {{ .Values.resources.cpuLimit | quote }}
+            memory: {{ .Values.resources.memoryLimit | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}
+          requests:
+            cpu: {{ .Values.resources.cpuRequest | quote }}
+            memory: {{ .Values.resources.memoryRequest | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}
+        livenessProbe:
+          exec:
+            command:
+              - redis-cli
+              - ping
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+              - redis-cli
+              - ping
+          initialDelaySeconds: 5
+          periodSeconds: 3

@@ -1,0 +1,42 @@
+replicaCount: 1
+namespace: cv
+
+image:
+  repository: triton-server
+  tag: v1
+  pullPolicy: Never
+
+service:
+  type: ClusterIP
+  http:
+    name: http
+    port: 8000
+    targetPort: 8000
+  grpc:
+    name: grpc
+    port: 8001
+    targetPort: 8001
+  metrics:
+    name: metrics
+    port: 8002
+    targetPort: 8002
+
+serviceHttp:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000  
+
+serviceMonitor:
+  enabled: false
+  path: /metrics
+  interval: 2s
+  scrapeTimeout: 1s
+  releaseLabel: serve
+
+resources:
+  cpuRequest: "250m"
+  cpuLimit: "1000m"
+  memoryRequest: "1Gi"
+  memoryLimit: "1Gi"
+  storageLimit: "1Gi"
+  gpuLimit: "1"

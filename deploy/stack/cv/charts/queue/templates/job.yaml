@@ -1,0 +1,31 @@
+{{- if .Values.initJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-kafka-init-job
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    spec:
+      initContainers:
+        {{- toYaml .Values.initService.initContainers | nindent 8 }}
+      restartPolicy: Never
+      containers:
+        - name: kafka-init-job-container
+          image: "{{ .Values.initJob.image.repository }}:{{ .Values.initJob.image.tag }}"
+          imagePullPolicy: {{ .Values.initJob.image.pullPolicy }}
+          command: ["python3", "kafka_init.py"]
+          volumeMounts:
+            - name: init-volume
+              mountPath: /queue
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ .Release.Name }}-{{ .Chart.Name }}-service:9092"
+      volumes:
+        - name: init-volume
+          configMap:
+            name: {{ .Release.Name }}-kafka-init-cm
+{{- end }}

@@ -1,0 +1,13 @@
+[project]
+name = "app"
+version = "0.1.0"
+requires-python = "==3.13.11"
+dependencies = [
+    "fastapi[standard]",
+    "PyJWT",
+    "tritonclient[all]",
+    "numpy",
+    "redis[hiredis]",
+    "opencv-python-headless",
+    "confluent-kafka[protobuf,schemaregistry]",
+]

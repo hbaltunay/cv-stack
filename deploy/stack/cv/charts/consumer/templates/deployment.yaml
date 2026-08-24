@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-consumer
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-consumer
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: {{ .Release.Name }}-container
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+          - "python"
+          - "app/main.py"
+        resources:
+          limits:
+            cpu: {{ .Values.resources.cpuLimit | quote }}
+            memory: {{ .Values.resources.memoryLimit | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}
+          requests:
+            cpu: {{ .Values.resources.cpuRequest | quote }}
+            memory: {{ .Values.resources.memoryRequest | quote }}
+            ephemeral-storage: {{.Values.resources.storageLimit | quote }}

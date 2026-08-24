@@ -1,0 +1,26 @@
+name: "dali_preprocess"
+backend: "dali"
+max_batch_size: 10
+
+input [
+  {
+    name: "DALI_INPUT_0"
+    data_type: TYPE_UINT8
+    dims: [ -1 ]
+  }
+]
+
+output [
+  {
+    name: "DALI_OUTPUT_0"
+    data_type: TYPE_FP32
+    dims: [ 3, 640, 640 ]
+  }
+]
+
+instance_group [
+  {
+    kind: KIND_GPU
+    count: 1
+  }
+]
